@@ -920,8 +920,12 @@ class Zappa(object):
         else:
             # Get any remote aws lambda env vars so they don't get trashed
             # Related: https://github.com/Miserlou/Zappa/issues/765
-            lambda_aws_environment_variables = self.lambda_client\
-                .get_function_configuration(FunctionName=function_name)["Environment"].get("Variables", {})
+            lambda_config = self.lambda_client\
+                .get_function_configuration(FunctionName=function_name)
+                
+            lambda_aws_environment_variables = {}
+            if "Environment" in lambda_config:
+                lambda_aws_environment_variables = lambda_config["Environment"].get("Variables", {})
 
             # Append keys that are remote but not in settings file
             for key, value in lambda_aws_environment_variables.items():
